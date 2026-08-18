@@ -49,6 +49,28 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      # `npm publish --provenance` REQUIRES package.json to carry a
+      # repository.url pointing at the repository the workflow runs in, and
+      # refuses the publish otherwise. typescript/package.json does not have
+      # one today, so without this check the run would build, test, and only
+      # then die at the very last step. Check it up front and name the fix.
+      #
+      # Guarded on the VALUE: `node -p` prints the empty string for a missing
+      # field and still exits 0, so testing its status would prove nothing.
+      - name: Require a repository field for provenance
+        working-directory: typescript
+        run: |
+          URL=$(node -p "(require('./package.json').repository||{}).url||''" 2>/dev/null || true)
+          if [ -z "$URL" ]; then
+            echo "::error::Cannot publish with --provenance: typescript/package.json has no \"repository\" field. Add {\"type\":\"git\",\"url\":\"git+https://github.com/${GITHUB_REPOSITORY}.git\",\"directory\":\"typescript\"} in the MisarPost source repo."
+            exit 1
+          fi
+          case "$URL" in
+            *"${GITHUB_REPOSITORY}"*) ;;
+            *) echo "::error::package.json repository.url is '${URL}', which does not name ${GITHUB_REPOSITORY}. npm rejects provenance when they disagree."
+               exit 1 ;;
+          esac
+
       # `npm ci` is the correct command and the one to get back to, but it
       # ABORTS when there is no package-lock.json — and typescript/ currently
       # ships without one, because the source repo has never committed a lock
