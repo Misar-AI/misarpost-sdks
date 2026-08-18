@@ -1,0 +1,68 @@
+name: Publish Python SDK
+
+# See publish-typescript.yml for why workflow_call exists: auto-tag.yml cannot
+# rely on the tag it pushes to start this workflow, so it calls it directly.
+on:
+  push:
+    tags: ['python/v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version being published (optional; pyproject.toml wins)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version being published (optional; pyproject.toml wins)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required for the OIDC token PyPI exchanges for a short-lived API key.
+      # The CALLING job in auto-tag.yml must grant this too — a called workflow
+      # can only narrow its caller's token, so without it the exchange fails.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # Install the package itself, not just the test tools: pytest imports the
+      # SDK, which imports its HTTP client, and `pip install build pytest`
+      # never brings that in. Without this the tests fail with
+      # ModuleNotFoundError before a single assertion runs.
+      - run: pip install build pytest pytest-asyncio
+      - run: pip install .
+        working-directory: python
+      - run: pytest
+        working-directory: python
+      - run: python -m build
+        working-directory: python
+
+      # PyPI Trusted Publishing (OIDC) — there is no secret to preflight, which
+      # is why this step has no credential check above it. The trust has to
+      # exist on PyPI's side instead: Manage project → Publishing, or a
+      # "pending publisher" for a project that does not exist yet, matching
+      #
+      #   owner:     Misar-AI
+      #   repo:      misarpost-sdks
+      #   workflow:  publish-python.yml
+      #   env:       (none)
+      #
+      # `misarpost` is unregistered on PyPI, so a PENDING publisher is the right
+      # thing to create — it registers the name on first publish.
+      #
+      # If the trust is missing this fails with a 403 naming the mismatch; it
+      # never silently no-ops. To fall back to a long-lived token instead, set
+      # the PYPI_API_TOKEN secret and uncomment the `password:` line — the
+      # action prefers OIDC whenever a trusted publisher exists, so configuring
+      # one later supersedes the token without another edit here.
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist/
+          # password: ${{ secrets.PYPI_API_TOKEN }}

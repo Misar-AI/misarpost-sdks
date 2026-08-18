@@ -1,0 +1,63 @@
+name: Validate & Tag Go SDK
+
+# Go modules are served directly from GitHub — pkg.go.dev auto-indexes on git
+# tag. There is no credential and nothing to push: this job only proves the
+# tagged commit compiles and passes, because once a tag is fetched by the module
+# proxy it is immutable.
+#
+# The module path must match the repository that serves it. This mirror keeps
+# each language in a subdirectory, so go/go.mod must declare
+#
+#   module github.com/Misar-AI/misarpost-sdks/go
+#
+# and its release tags are `go/vX.Y.Z` — the proxy derives the subdirectory from
+# the tag prefix. A mismatched module path makes `go get` fail with a "does not
+# contain package" error that reads like a network problem.
+#
+# workflow_call is here so auto-tag.yml (or any future caller) can run this in
+# its own run; a tag created with the default GITHUB_TOKEN emits no push event.
+on:
+  push:
+    tags: ['go/v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version being validated (optional; informational only)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version being validated (optional; informational only)'
+        required: false
+        type: string
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      # Catch the wrong module path before a tag makes it permanent, rather
+      # than after consumers hit it. Guarded on the VALUE — awk exits 0 and
+      # prints nothing when go.mod is absent.
+      - name: Check the module path
+        run: |
+          WANT="github.com/${GITHUB_REPOSITORY}/go"
+          GOT=$(awk '/^module / {print $2; exit}' go/go.mod 2>/dev/null | tr -d '[:space:]')
+          if [ "$GOT" != "$WANT" ]; then
+            echo "::error::go/go.mod declares module '${GOT}' — it must be '${WANT}' to be resolvable from this repository."
+            exit 1
+          fi
+
+      - run: go build ./...
+        working-directory: go
+      - run: go test ./...
+        working-directory: go
+      - run: go vet ./...
+        working-directory: go

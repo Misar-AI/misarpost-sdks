@@ -1,0 +1,112 @@
+name: Publish C# SDK
+
+# Publishes MisarPost to NuGet via Trusted Publishing (OIDC) — no API key.
+#
+# The matching policy to create on nuget.org is:
+#   Package owner:      misar
+#   Publisher:          GitHubActions
+#   Repository owner:   Misar-AI        (#278048041)
+#   Repository:         misarpost-sdks  (#1338451576)
+#   Workflow:           publish-csharp.yml
+#   Environment:        (none)
+#
+# Those five fields must keep matching or the token exchange is refused. In
+# particular: renaming this file, or adding an `environment:` key without
+# updating the policy, breaks publishing. Being *called* by auto-tag.yml does
+# not change the workflow identity in the OIDC claim — the claim names this
+# file, the one that actually runs the job — so the policy stays valid.
+#
+# See publish-typescript.yml for why workflow_call exists: auto-tag.yml cannot
+# rely on the tag it pushes to start this workflow, so it calls it directly.
+on:
+  push:
+    tags: ['csharp/v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to pack (optional; falls back to the tag, then the csproj)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to pack (optional; falls back to the tag, then the csproj)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      # Required for the OIDC token NuGet exchanges for a short-lived API key.
+      # auto-tag.yml must grant this on the CALLING job as well.
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Resolve from the caller's input first, then the tag, then the csproj.
+      # NOT `${GITHUB_REF_NAME#csharp/v}` alone: that only holds when a tag push
+      # started the run. Called from auto-tag.yml the ref is `main`, which in a
+      # sibling repo produced a package literally versioned "main".
+      # Test the VALUE at each step, never a pipeline's exit status — sed/grep
+      # exit 0 on empty input, so `|| fallback` would never fire. The csproj is
+      # globbed rather than named because csharp/ is still a placeholder and the
+      # file does not exist yet; `head -1` keeps it deterministic if several land.
+      - name: Resolve version
+        id: ver
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          VERSION="${INPUT_VERSION:-}"
+          if [ -z "$VERSION" ]; then
+            case "$GITHUB_REF" in
+              refs/tags/csharp/v*) VERSION="${GITHUB_REF#refs/tags/csharp/v}" ;;
+            esac
+          fi
+          if [ -z "$VERSION" ]; then
+            CSPROJ=$(ls csharp/*.csproj 2>/dev/null | head -1)
+            if [ -n "$CSPROJ" ]; then
+              VERSION=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$CSPROJ" | head -1)
+            fi
+          fi
+          if ! printf '%s' "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "::error::Cannot publish the MisarPost C# SDK: no usable version (got '${VERSION}'). Pass one via the workflow input, tag as csharp/vX.Y.Z, or set <Version> in csharp/MisarPost.csproj."
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - run: dotnet test
+        working-directory: csharp
+
+      - run: dotnet pack -c Release -p:PackageVersion=${{ steps.ver.outputs.VERSION }} -o ./nupkg
+        working-directory: csharp
+
+      # Exchanges the workflow's OIDC token for a temporary NuGet API key and
+      # writes it to the environment for the push below. Nothing long-lived is
+      # stored in repository secrets, so there is no secret to preflight here —
+      # a missing or broken trust policy fails this step with an explicit 403.
+      - name: Authenticate to NuGet
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: misar
+
+      - name: Push
+        working-directory: csharp
+        run: |
+          dotnet nuget push "./nupkg/*.nupkg" \
+            --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Summary
+        run: |
+          {
+            echo "### MisarPost ${{ steps.ver.outputs.VERSION }} → NuGet"
+            echo "Published via Trusted Publishing (OIDC) — no stored API key."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,47 @@
+name: Validate & Tag Swift SDK
+
+# SPM resolves directly from GitHub tags — the tag itself is the "publish".
+#
+# Consumers will depend on misarpost-swift, NOT this monorepo: SwiftPM requires
+# Package.swift at the repository ROOT and cannot resolve a subdirectory.
+# split-standalone.yml mirrors swift/ there and pushes the vX.Y.Z tag that SPM
+# actually resolves; this job is the gate that it compiles and passes tests
+# first. The standalone repo Misar-AI/misarpost-swift does not exist yet — see
+# the human to-do list; split-standalone.yml fails loudly until it does.
+#
+# Consumers will add:
+#   .package(url: "https://github.com/Misar-AI/misarpost-swift.git", from: "1.0.0")
+#
+# workflow_call is here so auto-tag.yml (or any future caller) can run this in
+# its own run; a tag created with the default GITHUB_TOKEN emits no push event.
+on:
+  push:
+    tags: ['swift/v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version being validated (optional; informational only)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version being validated (optional; informational only)'
+        required: false
+        type: string
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Linux on purpose: URLSession's async data(for:)/bytes(for:) do not exist
+    # in swift-corelibs-foundation, so a macOS build passes while the package is
+    # unusable there. That gap reached main once already in a sibling repo.
+    container: swift:5.10
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift build -c release
+        working-directory: swift
+      - run: swift test
+        working-directory: swift

@@ -1,0 +1,104 @@
+name: Publish TypeScript SDK
+
+# Three ways in, one job:
+#   push: tags        a tag pushed by a human (or any non-GITHUB_TOKEN actor)
+#   workflow_dispatch a manual re-run from the Actions tab
+#   workflow_call     auto-tag.yml calling this workflow in its own run
+#
+# The workflow_call entry point is the one that matters day to day: a tag
+# created with the default GITHUB_TOKEN never emits a push event (GitHub
+# suppresses it so workflows cannot retrigger themselves), so auto-tag.yml
+# invokes this workflow directly instead of hoping the tag wakes it up.
+on:
+  push:
+    tags: ['typescript/v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version being published (optional; package.json wins)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version being published (optional; package.json wins)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      # Fail before spending build minutes, and fail LOUDLY. A release pipeline
+      # that reports green while publishing nothing is worse than a red one.
+      - name: Require publishing credentials
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "${NPM_TOKEN:-}" ]; then
+            echo "::error::Cannot publish the MisarPost TypeScript SDK to npm: repository secret NPM_TOKEN is not set. Add it under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      # `npm ci` is the correct command and the one to get back to, but it
+      # ABORTS when there is no package-lock.json — and typescript/ currently
+      # ships without one, because the source repo has never committed a lock
+      # for the SDK. Branch on the FILE, not on `npm ci || npm install`: the
+      # latter would also swallow a genuine dependency-resolution failure and
+      # quietly install something different from what was tested.
+      # TODO(human): commit typescript/package-lock.json in the MisarPost source
+      # repo, then this falls back to `npm ci` on its own and the warning stops.
+      - name: Install dependencies
+        working-directory: typescript
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            echo "::warning::typescript/package-lock.json is missing — falling back to \`npm install\`, so this build is not reproducible. Commit a lockfile."
+            npm install --no-audit --no-fund
+          fi
+
+      - run: npm run build
+        working-directory: typescript
+
+      # The package declares no `test` script and src/__tests__/ holds only a
+      # .gitkeep, so `npm test` would fail on "missing script" and block the
+      # first release for a reason that has nothing to do with the code. Run
+      # the tests when they exist; say plainly when they do not. This is NOT
+      # the same forgiveness the credential check above refuses to grant — a
+      # missing secret means the publish cannot happen, while missing tests
+      # mean it happens unverified, and that tradeoff is the human's to make.
+      - name: Test
+        working-directory: typescript
+        run: |
+          if node -e "process.exit(require('./package.json').scripts?.test ? 0 : 1)"; then
+            npm test
+          else
+            echo "::warning::The MisarPost TypeScript SDK has no \`test\` script — publishing WITHOUT running any tests."
+          fi
+
+      # A granular npm token can be valid for publishing NEW VERSIONS of an
+      # existing package yet still 404 on the very first publish, because
+      # creating a package in a scope is a separate right. If this fails with
+      # `E404 PUT <name>`, the token needs package-creation rights on that
+      # scope (or the package must be created once by hand).
+      #
+      # NOTE ON THE PACKAGE NAME: package.json currently says
+      # "@misar/social-sdk". Every sibling product publishes as
+      # @<product>/sdk (@misarblog/sdk, …), so this would be the odd one out
+      # AND it claims a scope shared with other Misar packages. Nothing is
+      # published under either name yet, so renaming is still free — decide
+      # before the first release, because npm names cannot be reclaimed.
+      - run: npm publish --access public --provenance
+        working-directory: typescript
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

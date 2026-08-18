@@ -1,0 +1,65 @@
+name: Publish Kotlin SDK
+
+# See publish-typescript.yml for why workflow_call exists: auto-tag.yml cannot
+# rely on the tag it pushes to start this workflow, so it calls it directly.
+on:
+  push:
+    tags: ['kotlin/v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version being published (optional; build.gradle.kts wins)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version being published (optional; build.gradle.kts wins)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # Gradle happily builds and then fails the staging release at the end
+      # with an unhelpful 401 when any of these is empty. Fail here instead.
+      - name: Require publishing credentials
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          MISSING=""
+          [ -n "${OSSRH_USERNAME:-}" ]  || MISSING="$MISSING OSSRH_USERNAME"
+          [ -n "${OSSRH_TOKEN:-}" ]     || MISSING="$MISSING OSSRH_TOKEN"
+          [ -n "${GPG_KEY_ID:-}" ]      || MISSING="$MISSING GPG_KEY_ID"
+          [ -n "${GPG_PRIVATE_KEY:-}" ] || MISSING="$MISSING GPG_PRIVATE_KEY"
+          [ -n "${GPG_PASSPHRASE:-}" ]  || MISSING="$MISSING GPG_PASSPHRASE"
+          if [ -n "$MISSING" ]; then
+            for s in $MISSING; do
+              echo "::error::Cannot publish the MisarPost Kotlin SDK to Maven Central: repository secret $s is not set."
+            done
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - uses: gradle/actions/setup-gradle@v3
+      - run: ./gradlew test
+        working-directory: kotlin
+      - run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+        working-directory: kotlin
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          SIGNING_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          SIGNING_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.GPG_PASSPHRASE }}

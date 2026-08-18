@@ -1,0 +1,53 @@
+name: Publish Ruby SDK
+
+# See publish-typescript.yml for why workflow_call exists: auto-tag.yml cannot
+# rely on the tag it pushes to start this workflow, so it calls it directly.
+on:
+  push:
+    tags: ['ruby/v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version being published (optional; the gemspec wins)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version being published (optional; the gemspec wins)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Require publishing credentials
+        env:
+          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+        run: |
+          if [ -z "${RUBYGEMS_API_KEY:-}" ]; then
+            echo "::error::Cannot publish the MisarPost Ruby SDK to RubyGems: repository secret RUBYGEMS_API_KEY is not set."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+      # bundler-cache: true requires ruby/Gemfile + Gemfile.lock. The ruby SDK
+      # is still a placeholder, so those do not exist yet — this job cannot be
+      # reached until it has a gemspec anyway (auto-tag.yml finds no version and
+      # skips it), but the Gemfile has to land with the source.
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: ruby
+      - run: bundle exec rspec
+        working-directory: ruby
+      - run: gem build *.gemspec
+        working-directory: ruby
+      - run: gem push *.gem
+        working-directory: ruby
+        env:
+          GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}

@@ -1,0 +1,114 @@
+name: Register PHP package on Packagist
+
+# Packagist is not like npm or crates.io: pushing a tag publishes nothing until
+# the package has been SUBMITTED once. In a sibling repository that step was
+# never done, so every php/v* tag was a silent no-op for anyone trying to
+# `composer require` it. This does the submission over the API so it is part of
+# the pipeline rather than something someone has to remember.
+#
+# It is safe to run any number of times: a package that is already registered
+# reports success and changes nothing.
+#
+# TOKEN NOTE: create-package requires Packagist's MAIN API token. The SAFE token
+# (the "safe for CI" one on https://packagist.org/profile/) can only call
+# update-package, and returns 403 here. If this job fails with 403, swap the
+# value of PACKAGIST_API_TOKEN for the main token — the credentials are not
+# wrong, they are the wrong KIND.
+#
+# Run it by hand from the Actions tab (no inputs needed), or let
+# split-standalone.yml call it on every php/v* tag.
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository_url:
+        description: 'Repository to submit (default: the misarpost-php standalone repo)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      repository_url:
+        description: 'Repository to submit (default: the misarpost-php standalone repo)'
+        required: false
+        type: string
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Submit the package to Packagist
+        env:
+          PACKAGIST_USERNAME: ${{ secrets.PACKAGIST_USERNAME }}
+          PACKAGIST_API_TOKEN: ${{ secrets.PACKAGIST_API_TOKEN }}
+          REPO_URL: ${{ inputs.repository_url }}
+        run: |
+          set -uo pipefail
+
+          if [ -z "${REPO_URL:-}" ]; then
+            REPO_URL="https://github.com/${GITHUB_REPOSITORY_OWNER}/misarpost-php"
+          fi
+
+          MISSING=""
+          [ -n "${PACKAGIST_USERNAME:-}" ]  || MISSING="$MISSING PACKAGIST_USERNAME"
+          [ -n "${PACKAGIST_API_TOKEN:-}" ] || MISSING="$MISSING PACKAGIST_API_TOKEN"
+          if [ -n "$MISSING" ]; then
+            for s in $MISSING; do
+              echo "::error::Cannot submit ${REPO_URL} to Packagist: repository secret $s is not set."
+            done
+            exit 1
+          fi
+
+          # The token travels in the Authorization header, never in the URL, so
+          # it cannot leak through a logged request line. Nothing below echoes
+          # any part of it — $BODY is Packagist's own response.
+          BODY_FILE="$(mktemp)"
+          CODE=$(curl -sS -o "$BODY_FILE" -w '%{http_code}' \
+                   -X POST 'https://packagist.org/api/create-package' \
+                   -H "Authorization: Bearer ${PACKAGIST_USERNAME}:${PACKAGIST_API_TOKEN}" \
+                   -H 'Content-Type: application/json' \
+                   -d "{\"repository\":\"${REPO_URL}\"}") || CODE=""
+          BODY=$(cat "$BODY_FILE" 2>/dev/null || true)
+          rm -f "$BODY_FILE"
+
+          # Guard on the VALUE. `CODE` is empty only when curl never produced a
+          # status line at all (DNS/TLS/connection failure).
+          if [ -z "$CODE" ]; then
+            echo "::error::Could not reach packagist.org to submit ${REPO_URL} — no HTTP response."
+            exit 1
+          fi
+          echo "Packagist create-package → HTTP ${CODE}"
+          echo "${BODY}"
+
+          LOWER=$(printf '%s' "$BODY" | tr '[:upper:]' '[:lower:]')
+
+          # Idempotency first, and independent of the status code: a package that
+          # is already registered must not fail the run. Packagist has phrased
+          # this several ways over time, hence the spread of alternatives.
+          if printf '%s' "$LOWER" | grep -qE 'already (exists|taken|added|submitted|registered|in packagist)|is already|duplicate'; then
+            echo "::notice::${REPO_URL} is already on Packagist — nothing to do."
+            exit 0
+          fi
+
+          case "$CODE" in
+            2*)
+              if printf '%s' "$LOWER" | grep -q '"status": *"success"'; then
+                echo "::notice::Submitted ${REPO_URL} to Packagist."
+                exit 0
+              fi
+              echo "::error::Packagist answered HTTP ${CODE} without a success status for ${REPO_URL}; treating that as a failure rather than assuming it worked."
+              exit 1
+              ;;
+            401)
+              echo "::error::Packagist rejected the credentials (HTTP 401). Check PACKAGIST_USERNAME and PACKAGIST_API_TOKEN."
+              exit 1
+              ;;
+            403)
+              echo "::error::Packagist returned 403 for create-package. That endpoint needs the MAIN API token; the SAFE (CI) token can only call update-package. Replace PACKAGIST_API_TOKEN with the main token from https://packagist.org/profile/."
+              exit 1
+              ;;
+          esac
+
+          echo "::error::Packagist create-package failed with HTTP ${CODE} for ${REPO_URL}."
+          exit 1
