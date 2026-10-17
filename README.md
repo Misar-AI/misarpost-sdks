@@ -1,64 +1,76 @@
 # MisarPost SDKs
 
-Official client SDKs for the [MisarPost](https://api.misar.io/social) API.
+Official client libraries for the [MisarPost](https://www.misarpost.com) API —
+publishing and scheduling across every connected channel, AI generation and
+ContentRipple repurposing, TrendPulse, PersonaForge, analytics and workspaces.
 
-This repository is a **mirror**. The source of truth is the MisarPost monorepo
-(`sdks/<lang>/`); each language directory here is rsynced to the repository root
-so that per-language package managers and tooling can find a manifest where they
-expect one. Edit the SDKs upstream, not here.
+Every SDK covers the full key-authenticated API surface — **102 methods across
+17 resource groups**, generated from `sdks/manifest.json`, which is itself
+generated from the API's route tree (`scripts/sync-sdk-manifest.mjs`). They
+speak only HTTPS and authenticate with a MisarPost API key (`mpk_…`) sent as
+`Authorization: Bearer` — create one at
+[post.misar.io/dashboard/api-keys](https://post.misar.io/dashboard/api-keys).
 
-## Status
+Base URL: `https://api.misar.io/post` (dual-served at `https://post.misar.io/api`).
 
-Only the TypeScript SDK carries real source today. The other eleven directories
-are `Coming soon.` placeholders with no manifest.
+## Install
 
-| Language   | Source | Registry  | Package (planned)          | Published |
-|------------|--------|-----------|----------------------------|-----------|
-| typescript | yes    | npm       | see note below             | no        |
-| python     | stub   | PyPI      | `misarpost`                | no        |
-| rust       | stub   | crates.io | `misarpost`                | no        |
-| ruby       | stub   | RubyGems  | `misarpost`                | no        |
-| java       | stub   | Maven     | `io.misar:misarpost`       | no        |
-| kotlin     | stub   | Maven     | `io.misar:misarpost`       | no        |
-| csharp     | stub   | NuGet     | `MisarPost`                | no        |
-| dart       | stub   | pub.dev   | `misarpost`                | no        |
-| go         | stub   | proxy     | `…/misarpost-sdks/go`      | no        |
-| php        | stub   | Packagist | `misarai/misarpost-php`    | no        |
-| swift      | stub   | SwiftPM   | `misarpost-swift` (tag)    | no        |
-| flutter    | stub   | —         | **not published, see below** | n/a      |
+| Language | Registry | Package |
+|---|---|---|
+| TypeScript / JavaScript | npm | `@misarpost/sdk` |
+| CLI | npm | `@misarpost/cli` (bin `misarpost`) |
+| Python | PyPI | `misarpost` |
+| Go | module proxy | `github.com/Misar-AI/misarpost-sdks/go` |
+| Rust | crates.io | `misarpost` |
+| Java | Maven Central | `io.misar:misarpost` |
+| Kotlin | Maven Central | `io.misar:misarpost-kotlin` |
+| Swift | Swift PM | `https://github.com/Misar-AI/misarpost-sdks` (product `MisarPost`) |
+| Ruby | RubyGems | `misarpost` |
+| PHP | Packagist | `misarai/misarpost-php` |
+| C# / .NET | NuGet | `MisarPost` |
+| Dart | pub.dev | `misarpost` |
+| Flutter | pub.dev | `misarpost_flutter` |
 
-**TypeScript package name is unsettled.** `typescript/package.json` currently
-declares `@misar/social-sdk`, while every sibling product publishes as
-`@<product>/sdk`. Nothing is published under either name, so this is still free
-to change — and npm names cannot be reclaimed once taken.
+Each language directory has its own README with install, authentication, the
+resource table, quick start, pagination, plan limits and webhooks for that SDK.
 
-**There is one Dart package, not two.** `misarpost` is a pure-Dart package that
-works from the Dart CLI, a Dart server and Flutter, on Android, iOS, Linux,
-macOS and Windows. `flutter/` is mirrored for reference only; there is no
-`publish-flutter.yml` and no `misarpost_flutter` package.
+## Quick start
 
-## Releasing
+```ts
+import { MisarPostClient } from "@misarpost/sdk";
 
-`auto-tag.yml` runs on every push to `main`. It tags each SDK whose directory
-changed and whose manifest carries a usable `X.Y.Z` version, then **calls** the
-matching `publish-<lang>.yml` as a job in the same run.
+const post = new MisarPostClient(process.env.MISARPOST_API_KEY!);
+const { posts } = await post.posts.list<{ posts: unknown[] }>({ status: "queued" });
+```
 
-It calls rather than relying on the tag because a tag pushed with the default
-`GITHUB_TOKEN` does not emit a push event — GitHub suppresses those so workflows
-cannot retrigger themselves. Relying on `push: tags:` alone is why no publish
-workflow had ever run in two sibling repositories.
+## Shared behaviour
 
-Releases are gated by the repository variable `SDK_PUBLISH_TARGETS`:
+- **Scopes** — each method needs one API-key scope (listed per method in every
+  README and as `x-misarpost-scope` in the OpenAPI document). A missing scope
+  answers `403` with `code: "insufficient_scope"`.
+- **Plan limits** — a spent monthly allowance or a locked feature answers `402`
+  with `code: "plan_limit_exceeded"` and an upgrade offer. Every SDK detects it by
+  code before the status, raises a typed plan-limit error carrying the offer, and
+  never retries it.
+- **Retries** — `429` throttles, `500/502/503/504` and network failures, with
+  exponential backoff from 200 ms honouring `Retry-After`.
+- **Pagination** — a helper per language walks `?page=` until `totalPages`.
+- **Webhooks** — `X-MisarPost-Signature: sha256=<hex>` (HMAC-SHA256 of the raw body
+  with the endpoint's `mpwh_` secret) verification in every SDK.
 
-| Value         | Effect                                              |
-|---------------|-----------------------------------------------------|
-| unset / empty | dry run — reports what it would tag, publishes none  |
-| `python,rust` | only those languages                                |
-| `all`         | every changed SDK                                   |
+## Development
 
-It ships unset. Enable one language, confirm it on the registry, then widen.
+```bash
+pnpm sdk:sync    # manifest → generated SDK layers + READMEs → OpenAPI
+pnpm sdk:check   # the CI gates: drift, 100% coverage, lockfiles, release readiness
+```
 
-`go`, `php` and `swift` carry no version manifest — for all three the git tag is
-the release — so they are tagged by hand and `split-standalone.yml` mirrors PHP
-and Swift to their standalone repositories, which is where Packagist and SwiftPM
-can actually see a root manifest.
+Only the generated directories and READMEs are written by the generator; each
+language's core is hand-written. Releases: see [PUBLISHING.md](./PUBLISHING.md).
+
+## Links
+
+- Documentation — https://docs.misar.io/post
+- OpenAPI — https://api.misar.io/post/openapi.json
+- MCP server — https://api.misar.io/post/mcp (`npx -y @misarpost/mcp`)
+- Source mirror — https://github.com/Misar-AI/misarpost-sdks

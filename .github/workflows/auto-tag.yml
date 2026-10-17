@@ -1,267 +1,169 @@
-name: Auto-tag and publish changed SDKs
+name: Auto-tag on version bump
 
-# Tagging IS releasing — but NOT because the tag triggers anything.
+# Turns a deliberate version bump into a release tag, which is what actually
+# triggers publishing (see publish.yml).
 #
-# THE BUG THIS WORKFLOW IS SHAPED AROUND
-# A tag pushed with the default GITHUB_TOKEN does not emit a push event that can
-# start another workflow; GitHub suppresses those so workflows cannot retrigger
-# themselves. Every publish-<lang>.yml here also triggers on `push: tags:`, and
-# in the sibling repositories that was the ONLY entry point — so the tag landed,
-# nothing published, and the tagging job still went green. No publish workflow
-# had ever run in those repositories.
+# It fires only when an SDK's manifest version CHANGES between the previous
+# commit and this one. A code-only sync tags nothing, so routine mirrors are
+# silent — the version number is the release signal, and bumping it is always a
+# deliberate act.
 #
-# The obvious fix is a RELEASE_TOKEN PAT (a push authored by a PAT does emit the
-# event). That trades a silent failure for a secret nobody configured, and a PAT
-# that expires puts the pipeline right back where it started. So: there is no
-# cross-workflow event here. Each publish-<lang>.yml is a reusable workflow and
-# this file CALLS it, in this same run, immediately after the tag is created.
-# One run, no event, no PAT.
-#
-# A `jobs.<id>.uses:` reference cannot be assembled from a shell variable, so
-# there is one gated job per language below rather than a matrix. The `tag` job
-# writes `<lang>=true` to its outputs for exactly the languages it actually
-# tagged, and each publish job keys off that.
-#
-# SAFETY GATE — the repository variable SDK_PUBLISH_TARGETS decides which
-# languages may be tagged, and therefore which may publish:
-#
-#   unset / empty   nothing is tagged; the job reports what it would have done
-#   python,rust     only those two
-#   all             every changed SDK
-#
-# It defaults to off because a sync that touches every SDK directory would
-# otherwise release every package at once, and a published version can never
-# be replaced. Enable one language, confirm it on the registry, then widen.
-#
-# STATUS AT THE TIME THIS REPOSITORY WAS CREATED
-# Only `typescript/` carries real source. The other eleven directories are
-# "Coming soon." placeholders with no manifest, so `extract_version` finds
-# nothing for them and they are skipped with a warning rather than tagged.
-# That is the intended behaviour — the scaffolding is here and goes live for
-# each language the moment that language grows a manifest.
+# Tag shape is `<language>/vX.Y.Z`, matching misarmail-sdks, misarblog-sdks and misarreach-sdks.
+# This is not cosmetic: a Go module in the go/ subdirectory is ONLY resolvable
+# by a `go/vX.Y.Z` tag, and a bare `vX.Y.Z` would leave `go get` unable to find
+# any version at all.
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
-# NOTE: flutter is deliberately absent. The product ships ONE pure-Dart package
-# per product (misarblog / misarmail / misarreach / misarpost) that works from
-# Dart CLI, Dart server and Flutter on Android, iOS, Linux, macOS and Windows.
-# `flutter/` is mirrored for reference but is never built or published here.
-
 jobs:
   tag:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      typescript: ${{ steps.tag.outputs.typescript }}
-      typescript_version: ${{ steps.tag.outputs.typescript_version }}
-      python: ${{ steps.tag.outputs.python }}
-      python_version: ${{ steps.tag.outputs.python_version }}
-      rust: ${{ steps.tag.outputs.rust }}
-      rust_version: ${{ steps.tag.outputs.rust_version }}
-      ruby: ${{ steps.tag.outputs.ruby }}
-      ruby_version: ${{ steps.tag.outputs.ruby_version }}
-      java: ${{ steps.tag.outputs.java }}
-      java_version: ${{ steps.tag.outputs.java_version }}
-      kotlin: ${{ steps.tag.outputs.kotlin }}
-      kotlin_version: ${{ steps.tag.outputs.kotlin_version }}
-      csharp: ${{ steps.tag.outputs.csharp }}
-      csharp_version: ${{ steps.tag.outputs.csharp_version }}
-      dart: ${{ steps.tag.outputs.dart }}
-      dart_version: ${{ steps.tag.outputs.dart_version }}
     steps:
       - uses: actions/checkout@v4
         with:
-          # Tags are needed to tell "already released" from "new release".
           fetch-depth: 0
+          # MUST be a PAT, not the default GITHUB_TOKEN.
+          #
+          # GitHub deliberately does not start a workflow run from an event
+          # created with GITHUB_TOKEN — it is loop prevention. A tag pushed with
+          # it is created perfectly and then triggers NOTHING, so publish.yml
+          # never fires and the release silently stops halfway.
+          #
+          # This is not theoretical: misarmail-sdks and misarblog-sdks are wired
+          # this way, and neither has ever run a publish workflow. Their Go
+          # modules resolve only because proxy.golang.org serves straight from
+          # the git tag without CI.
+          #
+          # Verified both ways on this repo: the same tag pushed by GITHUB_TOKEN
+          # started no run; pushed by a user token it started publish.yml
+          # immediately.
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
 
-      - name: Tag changed SDKs
-        id: tag
+      # Checked at runtime, not with `if:` — the `secrets` context is not
+      # available in step conditionals, and referencing it there fails the whole
+      # workflow at validation time with no job ever starting.
+      - name: Warn if tags cannot trigger a publish
         env:
-          TARGETS: ${{ vars.SDK_PUBLISH_TARGETS }}
-          BEFORE: ${{ github.event.before }}
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          GATE=",$(echo "${TARGETS:-}" | tr -d '[:space:]'),"
-
-          if [ "$GATE" = ",," ]; then
-            echo "::notice::SDK_PUBLISH_TARGETS is unset — DRY RUN, nothing will be tagged or published."
+          if [ -z "${RELEASE_TOKEN:-}" ]; then
+            echo "::warning::RELEASE_TOKEN is not set. Tags will be created with GITHUB_TOKEN, which cannot trigger publish.yml — each SDK will need publish.yml run manually. See the comment in this file."
           else
-            echo "::notice::Tagging enabled for: ${TARGETS}"
+            echo "RELEASE_TOKEN present — tags will trigger publish.yml."
           fi
 
-          # Which files moved. Every branch here is guarded on the VALUE, not on
-          # an exit status: `git diff <empty-before> <sha>` succeeds with no
-          # output, so an `|| fallback` chained onto it would never fire and a
-          # workflow_dispatch run would silently see zero changed files.
-          CHANGED=""
-          if [ -n "${BEFORE:-}" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
-            CHANGED=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" 2>/dev/null || true)
-          fi
-          if [ -z "$CHANGED" ]; then
-            # First push of the branch, a force-push, or a manual dispatch:
-            # fall back to the tip commit's own file list.
-            CHANGED=$(git show --name-only --format="" "$GITHUB_SHA" 2>/dev/null || true)
-          fi
-          echo "Changed files: $CHANGED"
+      - name: Tag every SDK whose version changed
+        run: |
+          set -euo pipefail
 
-          # Returns the version or an EMPTY string. It deliberately does not
-          # pretend to default to "0.1.0": a `|| echo "0.1.0"` would test the
-          # PIPELINE's status, and a trailing tr/grep/head/awk exits 0 even on
-          # empty input, so the default would never apply. Unguarded, that mints
-          # tags literally named "<lang>/v" — which match publish-<lang>.yml's
-          # `*/v*` trigger while failing its version parse. It has happened in
-          # two sibling repositories. The caller checks the VALUE below.
-          extract_version() {
-            local lang=$1
-            case $lang in
-              typescript)
-                jq -r '.version // ""' "${lang}/package.json" 2>/dev/null || true ;;
-              python)
-                grep '^version' python/pyproject.toml 2>/dev/null | grep -oE '"[^"]+"' | tr -d '"' | head -1 || true ;;
-              rust)
-                grep '^version' rust/Cargo.toml 2>/dev/null | grep -oE '"[^"]+"' | tr -d '"' | head -1 || true ;;
-              ruby)
-                grep -h 's\.version\|spec\.version' ruby/*.gemspec 2>/dev/null | grep -oE '"[^"]+"' | tr -d '"' | head -1 || true ;;
-              java)
-                grep '<version>' java/pom.xml 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true ;;
-              kotlin)
-                grep '^version' kotlin/build.gradle.kts 2>/dev/null | grep -oE '"[^"]+"' | tr -d '"' | head -1 || true ;;
-              csharp)
-                grep '<Version>' csharp/*.csproj 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true ;;
-              dart)
-                grep '^version' "${lang}/pubspec.yaml" 2>/dev/null | awk '{print $2}' | head -1 || true ;;
-              *)
-                cat "${lang}/VERSION" 2>/dev/null | tr -d '[:space:]' || true ;;
+          # Read the shipped version out of one SDK's manifest at a given ref.
+          # Prints nothing when the SDK has no manifest version (go, swift, php
+          # are tag-versioned) or the file does not exist at that ref.
+          version_at() {
+            local ref="$1" lang="$2" file expr
+            case "$lang" in
+              typescript) file="typescript/package.json" ;;
+              cli)        file="cli/package.json" ;;
+              python)     file="python/pyproject.toml" ;;
+              rust)       file="rust/Cargo.toml" ;;
+              ruby)       file="ruby/misarpost.gemspec" ;;
+              dart)       file="dart/pubspec.yaml" ;;
+              flutter)    file="flutter/pubspec.yaml" ;;
+              java)       file="java/pom.xml" ;;
+              kotlin)     file="kotlin/build.gradle.kts" ;;
+              csharp)     file="csharp/MisarPost.csproj" ;;
+              *)          return 0 ;;
+            esac
+
+            local content
+            content="$(git show "${ref}:${file}" 2>/dev/null)" || return 0
+
+            case "$lang" in
+              typescript|cli) printf '%s' "$content" | jq -r '.version // empty' ;;
+              python|rust) printf '%s' "$content" | grep -m1 -E '^version[[:space:]]*=' | grep -oE '"[^"]+"' | tr -d '"' ;;
+              ruby|kotlin) printf '%s' "$content" | grep -m1 -E 'version[[:space:]]*=' | grep -oE '"[^"]+"' | tr -d '"' ;;
+              dart|flutter) printf '%s' "$content" | grep -m1 -E '^version:' | awk '{print $2}' ;;
+              java) printf '%s' "$content" | grep -m1 -oE '<version>[^<]+</version>' | sed 's/<[^>]*>//g' ;;
+              csharp) printf '%s' "$content" | grep -m1 -oE '<Version>[^<]+</Version>' | sed 's/<[^>]*>//g' ;;
             esac
           }
 
-          git config user.email "ci@misar.io"
-          git config user.name "Misar CI"
+          # First push to a fresh mirror has no parent to diff against; tag
+          # everything so the initial release is complete rather than empty.
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            PREV="HEAD~1"
+          else
+            PREV=""
+            echo "No parent commit — treating this as the initial release."
+          fi
 
-          # go, php and swift are deliberately absent from this loop: none of
-          # them carries a version manifest, because for all three the git tag
-          # IS the release (proxy.golang.org, Packagist and SwiftPM each read
-          # the tag). There is nothing here to derive a version from, so they
-          # are tagged by hand and split-standalone.yml takes it from there.
-          for lang in typescript python rust ruby java kotlin csharp dart; do
-            if echo "$CHANGED" | grep -qE "^${lang}/"; then
-              VERSION=$(extract_version "$lang" | tr -d '[:space:]')
-              if ! printf '%s' "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
-                echo "::warning::${lang}: no usable version (got '${VERSION}') — not tagging."
-                echo "- \`${lang}\` skipped: no usable version" >> "$GITHUB_STEP_SUMMARY"
+          git config user.name  "Misar.AI"
+          git config user.email "noreply@misar.io"
+
+          TAGGED=0
+          for LANG in typescript cli python rust ruby dart flutter java kotlin csharp; do
+            NOW="$(version_at HEAD "$LANG" || true)"
+            [ -n "$NOW" ] || continue
+
+            if [ -n "$PREV" ]; then
+              OLD="$(version_at "$PREV" "$LANG" || true)"
+              if [ "$NOW" = "$OLD" ]; then
+                echo "· $LANG unchanged at $NOW"
                 continue
               fi
-              TAG="${lang}/v${VERSION}"
-              if git tag | grep -qx "$TAG"; then
-                echo "⏭  Tag $TAG already exists — ${lang} v${VERSION} is already released, not republishing."
-                echo "- \`$TAG\` already exists" >> "$GITHUB_STEP_SUMMARY"
-              elif ! echo "$GATE" | grep -q ",${lang}," && ! echo "$GATE" | grep -q ",all,"; then
-                echo "🔒 Would tag $TAG — skipped, ${lang} is not in SDK_PUBLISH_TARGETS."
-                echo "- \`$TAG\` withheld (gate)" >> "$GITHUB_STEP_SUMMARY"
-              else
-                echo "🏷  Creating tag $TAG"
-                git tag "$TAG"
-                git push origin "$TAG"
-                # This, not the tag push, is what makes the publish run: the
-                # gated publish-<lang> job below reads these outputs.
-                echo "${lang}=true" >> "$GITHUB_OUTPUT"
-                echo "${lang}_version=${VERSION}" >> "$GITHUB_OUTPUT"
-                echo "- \`$TAG\` tagged → publish-${lang}.yml runs in this workflow" >> "$GITHUB_STEP_SUMMARY"
-              fi
             fi
+
+            TAG="$LANG/v$NOW"
+            if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+              echo "! $TAG already exists — refusing to move a released tag"
+              continue
+            fi
+
+            echo "+ $TAG"
+            git tag "$TAG"
+            git push origin "$TAG"
+            TAGGED=$((TAGGED + 1))
           done
 
-  # ---------------------------------------------------------------------------
-  # One gated call per language. `uses:` cannot be built from a variable, hence
-  # the repetition. `secrets: inherit` is required — a called workflow gets no
-  # secrets otherwise — and `permissions:` has to be granted here too, because a
-  # called workflow can only NARROW what its caller job already holds. That is
-  # what `id-token: write` below is for: npm provenance, PyPI and NuGet OIDC all
-  # lose their credential silently if the caller does not grant it.
-  # ---------------------------------------------------------------------------
+          # go, swift and php carry no manifest version. They ride the release
+          # of the fleet: tag them whenever anything else was tagged, using the
+          # typescript version as the fleet version.
+          if [ "$TAGGED" -gt 0 ]; then
+            FLEET="$(version_at HEAD typescript || true)"
+            if [ -n "$FLEET" ]; then
+              for LANG in go swift php; do
+                TAG="$LANG/v$FLEET"
+                if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+                  echo "! $TAG already exists"
+                  continue
+                fi
+                echo "+ $TAG (tag-versioned SDK, riding fleet version)"
+                git tag "$TAG"
+                git push origin "$TAG"
+              done
 
-  publish-typescript:
-    needs: tag
-    if: needs.tag.outputs.typescript == 'true'
-    uses: ./.github/workflows/publish-typescript.yml
-    permissions:
-      contents: read
-      id-token: write
-    secrets: inherit
-    with:
-      version: ${{ needs.tag.outputs.typescript_version }}
+              # Swift PM additionally needs a BARE semver tag. It reads versions
+              # from the repository root and does not recognise a prefixed tag as
+              # a version at all — `swift/v1.0.0` resolves to "no versions match".
+              # Verified against a real consumer package: with only the prefixed
+              # tag, resolution fails; with `v1.0.0` present it resolves to 1.0.0.
+              #
+              # Safe alongside Go, which needs the OPPOSITE convention: its module
+              # lives in go/ so it is versioned by `go/vX.Y.Z`, and there is no
+              # go.mod at the repository root for a bare tag to collide with.
+              if git rev-parse -q --verify "refs/tags/v$FLEET" >/dev/null; then
+                echo "! v$FLEET already exists"
+              else
+                echo "+ v$FLEET (bare tag — the only form Swift PM accepts)"
+                git tag "v$FLEET"
+                git push origin "v$FLEET"
+              fi
+            fi
+          fi
 
-  publish-python:
-    needs: tag
-    if: needs.tag.outputs.python == 'true'
-    uses: ./.github/workflows/publish-python.yml
-    permissions:
-      contents: read
-      id-token: write
-    secrets: inherit
-    with:
-      version: ${{ needs.tag.outputs.python_version }}
-
-  publish-rust:
-    needs: tag
-    if: needs.tag.outputs.rust == 'true'
-    uses: ./.github/workflows/publish-rust.yml
-    permissions:
-      contents: read
-    secrets: inherit
-    with:
-      version: ${{ needs.tag.outputs.rust_version }}
-
-  publish-ruby:
-    needs: tag
-    if: needs.tag.outputs.ruby == 'true'
-    uses: ./.github/workflows/publish-ruby.yml
-    permissions:
-      contents: read
-    secrets: inherit
-    with:
-      version: ${{ needs.tag.outputs.ruby_version }}
-
-  publish-java:
-    needs: tag
-    if: needs.tag.outputs.java == 'true'
-    uses: ./.github/workflows/publish-java.yml
-    permissions:
-      contents: read
-    secrets: inherit
-    with:
-      version: ${{ needs.tag.outputs.java_version }}
-
-  publish-kotlin:
-    needs: tag
-    if: needs.tag.outputs.kotlin == 'true'
-    uses: ./.github/workflows/publish-kotlin.yml
-    permissions:
-      contents: read
-    secrets: inherit
-    with:
-      version: ${{ needs.tag.outputs.kotlin_version }}
-
-  publish-csharp:
-    needs: tag
-    if: needs.tag.outputs.csharp == 'true'
-    uses: ./.github/workflows/publish-csharp.yml
-    permissions:
-      contents: read
-      id-token: write
-    secrets: inherit
-    with:
-      version: ${{ needs.tag.outputs.csharp_version }}
-
-  publish-dart:
-    needs: tag
-    if: needs.tag.outputs.dart == 'true'
-    uses: ./.github/workflows/publish-dart.yml
-    permissions:
-      contents: read
-    secrets: inherit
-    with:
-      version: ${{ needs.tag.outputs.dart_version }}
+          echo "Tagged $TAGGED versioned SDK(s)."

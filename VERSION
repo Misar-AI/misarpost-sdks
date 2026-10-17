@@ -1,0 +1,8 @@
+# Release version for the SDKs whose registry resolves from a git tag rather
+# than a manifest field: Go (proxy.golang.org), Swift (SPM) and PHP (Packagist).
+#
+# The other nine SDKs (and the CLI) carry their version in their own manifest and
+# are detected from there — see scripts/sdk-versions.mjs. Bump this line to cut a
+# release for the three below; the mirror's auto-tag workflow publishes them as
+# `go/vX.Y.Z`, `swift/vX.Y.Z` + bare `vX.Y.Z` (Swift) and `php/vX.Y.Z`.
+1.0.0
