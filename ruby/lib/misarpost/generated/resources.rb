@@ -107,8 +107,8 @@ module MisarPost
       end
 
       # PATCH /connections/:accountId/plugs (scope: connections:write)
-      def update_plugs(account_id, body = {}, query: nil)
-        @transport.request("PATCH", "/connections/#{Transport.enc(account_id)}/plugs", query: query, body: body)
+      def update_plugs(account_id, body = {}, query: nil, **fields)
+        @transport.request("PATCH", "/connections/#{Transport.enc(account_id)}/plugs", query: query, body: Transport.body(body, fields))
       end
 
       # GET /connections/:accountId/wordpress-taxonomies (scope: connections:read)
@@ -124,13 +124,13 @@ module MisarPost
       end
 
       # DELETE /contentripple/history (scope: posts:write)
-      def delete_history(body = {}, query: nil)
-        @transport.request("DELETE", "/contentripple/history", query: query, body: body)
+      def delete_history(body = {}, query: nil, **fields)
+        @transport.request("DELETE", "/contentripple/history", query: query, body: Transport.body(body, fields))
       end
 
       # POST /contentripple/feed (scope: generate:write)
-      def feed(body = {}, query: nil)
-        @transport.request("POST", "/contentripple/feed", query: query, body: body)
+      def feed(body = {}, query: nil, **fields)
+        @transport.request("POST", "/contentripple/feed", query: query, body: Transport.body(body, fields))
       end
 
       # GET /contentripple/history (scope: posts:read)
@@ -139,23 +139,23 @@ module MisarPost
       end
 
       # POST /contentripple/parse (scope: generate:write)
-      def parse(body = {}, query: nil)
-        @transport.request("POST", "/contentripple/parse", query: query, body: body)
+      def parse(body = {}, query: nil, **fields)
+        @transport.request("POST", "/contentripple/parse", query: query, body: Transport.body(body, fields))
       end
 
       # POST /contentripple (scope: generate:write)
-      def repurpose(body = {}, query: nil)
-        @transport.request("POST", "/contentripple", query: query, body: body)
+      def repurpose(body = {}, query: nil, **fields)
+        @transport.request("POST", "/contentripple", query: query, body: Transport.body(body, fields))
       end
 
       # POST /contentripple/schedule (scope: schedule:write)
-      def schedule(body = {}, query: nil)
-        @transport.request("POST", "/contentripple/schedule", query: query, body: body)
+      def schedule(body = {}, query: nil, **fields)
+        @transport.request("POST", "/contentripple/schedule", query: query, body: Transport.body(body, fields))
       end
 
       # PATCH /contentripple/variants (scope: posts:write)
-      def update_variants(body = {}, query: nil)
-        @transport.request("PATCH", "/contentripple/variants", query: query, body: body)
+      def update_variants(body = {}, query: nil, **fields)
+        @transport.request("PATCH", "/contentripple/variants", query: query, body: Transport.body(body, fields))
       end
 
       # GET /contentripple (scope: posts:read)
@@ -171,8 +171,8 @@ module MisarPost
       end
 
       # POST /drafts (scope: posts:write)
-      def create(body = {}, query: nil)
-        @transport.request("POST", "/drafts", query: query, body: body)
+      def create(body = {}, query: nil, **fields)
+        @transport.request("POST", "/drafts", query: query, body: Transport.body(body, fields))
       end
 
       # GET /drafts (scope: posts:read)
@@ -188,23 +188,23 @@ module MisarPost
       end
 
       # POST /generate (scope: generate:write)
-      def create(body = {}, query: nil)
-        @transport.request("POST", "/generate", query: query, body: body)
+      def create(body = {}, query: nil, **fields)
+        @transport.request("POST", "/generate", query: query, body: Transport.body(body, fields))
       end
 
       # POST /generate/enhance (scope: generate:write)
-      def enhance(body = {}, query: nil)
-        @transport.request("POST", "/generate/enhance", query: query, body: body)
+      def enhance(body = {}, query: nil, **fields)
+        @transport.request("POST", "/generate/enhance", query: query, body: Transport.body(body, fields))
       end
 
       # POST /generate/hashtags (scope: generate:write)
-      def hashtags(body = {}, query: nil)
-        @transport.request("POST", "/generate/hashtags", query: query, body: body)
+      def hashtags(body = {}, query: nil, **fields)
+        @transport.request("POST", "/generate/hashtags", query: query, body: Transport.body(body, fields))
       end
 
       # POST /generate/image (scope: generate:write)
-      def image(body = {}, query: nil)
-        @transport.request("POST", "/generate/image", query: query, body: body)
+      def image(body = {}, query: nil, **fields)
+        @transport.request("POST", "/generate/image", query: query, body: Transport.body(body, fields))
       end
 
       # GET /generate/optimize (scope: generate:write)
@@ -213,8 +213,8 @@ module MisarPost
       end
 
       # POST /generate/plan (scope: generate:write)
-      def plan(body = {}, query: nil)
-        @transport.request("POST", "/generate/plan", query: query, body: body)
+      def plan(body = {}, query: nil, **fields)
+        @transport.request("POST", "/generate/plan", query: query, body: Transport.body(body, fields))
       end
     end
 
@@ -291,28 +291,28 @@ module MisarPost
       end
 
       # POST /personaforge/replies/approve (scope: personas:write)
-      def approve_replies(body = {}, query: nil)
-        @transport.request("POST", "/personaforge/replies/approve", query: query, body: body)
+      def approve_replies(body = {}, query: nil, **fields)
+        @transport.request("POST", "/personaforge/replies/approve", query: query, body: Transport.body(body, fields))
       end
 
       # POST /personaforge/bio (scope: generate:write)
-      def bio(body = {}, query: nil)
-        @transport.request("POST", "/personaforge/bio", query: query, body: body)
+      def bio(body = {}, query: nil, **fields)
+        @transport.request("POST", "/personaforge/bio", query: query, body: Transport.body(body, fields))
       end
 
       # POST /personaforge/competitors (scope: personas:write)
-      def create_competitors(body = {}, query: nil)
-        @transport.request("POST", "/personaforge/competitors", query: query, body: body)
+      def create_competitors(body = {}, query: nil, **fields)
+        @transport.request("POST", "/personaforge/competitors", query: query, body: Transport.body(body, fields))
       end
 
       # POST /personaforge/personas (scope: personas:write)
-      def create_persona(body = {}, query: nil)
-        @transport.request("POST", "/personaforge/personas", query: query, body: body)
+      def create_persona(body = {}, query: nil, **fields)
+        @transport.request("POST", "/personaforge/personas", query: query, body: Transport.body(body, fields))
       end
 
       # POST /personaforge/replies (scope: personas:write)
-      def create_replies(body = {}, query: nil)
-        @transport.request("POST", "/personaforge/replies", query: query, body: body)
+      def create_replies(body = {}, query: nil, **fields)
+        @transport.request("POST", "/personaforge/replies", query: query, body: Transport.body(body, fields))
       end
 
       # POST /personaforge/voice (scope: personas:write)
@@ -326,8 +326,8 @@ module MisarPost
       end
 
       # POST /personaforge/generate (scope: generate:write)
-      def generate(body = {}, query: nil)
-        @transport.request("POST", "/personaforge/generate", query: query, body: body)
+      def generate(body = {}, query: nil, **fields)
+        @transport.request("POST", "/personaforge/generate", query: query, body: Transport.body(body, fields))
       end
 
       # GET /personaforge/personas/:id (scope: personas:read)
@@ -361,8 +361,8 @@ module MisarPost
       end
 
       # PATCH /personaforge/personas/:id (scope: personas:write)
-      def update_persona(id, body = {}, query: nil)
-        @transport.request("PATCH", "/personaforge/personas/#{Transport.enc(id)}", query: query, body: body)
+      def update_persona(id, body = {}, query: nil, **fields)
+        @transport.request("PATCH", "/personaforge/personas/#{Transport.enc(id)}", query: query, body: Transport.body(body, fields))
       end
     end
 
@@ -378,8 +378,8 @@ module MisarPost
       end
 
       # DELETE /posts (scope: posts:write)
-      def cancel(body = {}, query: nil)
-        @transport.request("DELETE", "/posts", query: query, body: body)
+      def cancel(body = {}, query: nil, **fields)
+        @transport.request("DELETE", "/posts", query: query, body: Transport.body(body, fields))
       end
 
       # DELETE /posts/:id (scope: posts:write)
@@ -393,8 +393,8 @@ module MisarPost
       end
 
       # POST /posts/:id/reply (scope: posts:write)
-      def reply(id, body = {}, query: nil)
-        @transport.request("POST", "/posts/#{Transport.enc(id)}/reply", query: query, body: body)
+      def reply(id, body = {}, query: nil, **fields)
+        @transport.request("POST", "/posts/#{Transport.enc(id)}/reply", query: query, body: Transport.body(body, fields))
       end
 
       # POST /posts/:id/revert (scope: posts:write)
@@ -403,13 +403,13 @@ module MisarPost
       end
 
       # POST /posts/revert-batch (scope: posts:write)
-      def revert_batch(body = {}, query: nil)
-        @transport.request("POST", "/posts/revert-batch", query: query, body: body)
+      def revert_batch(body = {}, query: nil, **fields)
+        @transport.request("POST", "/posts/revert-batch", query: query, body: Transport.body(body, fields))
       end
 
       # POST /schedule (scope: schedule:write)
-      def schedule(body = {}, query: nil)
-        @transport.request("POST", "/schedule", query: query, body: body)
+      def schedule(body = {}, query: nil, **fields)
+        @transport.request("POST", "/schedule", query: query, body: Transport.body(body, fields))
       end
 
       # POST /posts/:id/share (scope: posts:write)
@@ -423,8 +423,8 @@ module MisarPost
       end
 
       # PATCH /posts/:id (scope: posts:write)
-      def update(id, body = {}, query: nil)
-        @transport.request("PATCH", "/posts/#{Transport.enc(id)}", query: query, body: body)
+      def update(id, body = {}, query: nil, **fields)
+        @transport.request("PATCH", "/posts/#{Transport.enc(id)}", query: query, body: Transport.body(body, fields))
       end
     end
 
@@ -435,8 +435,8 @@ module MisarPost
       end
 
       # POST /post-tags (scope: posts:write)
-      def create(body = {}, query: nil)
-        @transport.request("POST", "/post-tags", query: query, body: body)
+      def create(body = {}, query: nil, **fields)
+        @transport.request("POST", "/post-tags", query: query, body: Transport.body(body, fields))
       end
 
       # DELETE /post-tags/:id (scope: posts:write)
@@ -450,8 +450,8 @@ module MisarPost
       end
 
       # PATCH /post-tags/:id (scope: posts:write)
-      def update(id, body = {}, query: nil)
-        @transport.request("PATCH", "/post-tags/#{Transport.enc(id)}", query: query, body: body)
+      def update(id, body = {}, query: nil, **fields)
+        @transport.request("PATCH", "/post-tags/#{Transport.enc(id)}", query: query, body: Transport.body(body, fields))
       end
     end
 
@@ -462,8 +462,8 @@ module MisarPost
       end
 
       # POST /post-templates (scope: posts:write)
-      def create(body = {}, query: nil)
-        @transport.request("POST", "/post-templates", query: query, body: body)
+      def create(body = {}, query: nil, **fields)
+        @transport.request("POST", "/post-templates", query: query, body: Transport.body(body, fields))
       end
 
       # DELETE /post-templates/:id (scope: posts:write)
@@ -482,8 +482,8 @@ module MisarPost
       end
 
       # PATCH /post-templates/:id (scope: posts:write)
-      def update(id, body = {}, query: nil)
-        @transport.request("PATCH", "/post-templates/#{Transport.enc(id)}", query: query, body: body)
+      def update(id, body = {}, query: nil, **fields)
+        @transport.request("PATCH", "/post-templates/#{Transport.enc(id)}", query: query, body: Transport.body(body, fields))
       end
     end
 
@@ -494,8 +494,8 @@ module MisarPost
       end
 
       # POST /trendpulse/platform-content (scope: trends:write)
-      def create_platform_content(body = {}, query: nil)
-        @transport.request("POST", "/trendpulse/platform-content", query: query, body: body)
+      def create_platform_content(body = {}, query: nil, **fields)
+        @transport.request("POST", "/trendpulse/platform-content", query: query, body: Transport.body(body, fields))
       end
 
       # POST /trendpulse/digest (scope: trends:write)
@@ -529,18 +529,18 @@ module MisarPost
       end
 
       # POST /trendpulse/pipeline (scope: schedule:write)
-      def pipeline(body = {}, query: nil)
-        @transport.request("POST", "/trendpulse/pipeline", query: query, body: body)
+      def pipeline(body = {}, query: nil, **fields)
+        @transport.request("POST", "/trendpulse/pipeline", query: query, body: Transport.body(body, fields))
       end
 
       # POST /trendpulse (scope: trends:write)
-      def refresh(body = {}, query: nil)
-        @transport.request("POST", "/trendpulse", query: query, body: body)
+      def refresh(body = {}, query: nil, **fields)
+        @transport.request("POST", "/trendpulse", query: query, body: Transport.body(body, fields))
       end
 
       # POST /trendpulse/platform-content/use (scope: trends:write)
-      def use_platform_content(body = {}, query: nil)
-        @transport.request("POST", "/trendpulse/platform-content/use", query: query, body: body)
+      def use_platform_content(body = {}, query: nil, **fields)
+        @transport.request("POST", "/trendpulse/platform-content/use", query: query, body: Transport.body(body, fields))
       end
     end
 
@@ -556,13 +556,13 @@ module MisarPost
       end
 
       # POST /video/generate (scope: generate:write)
-      def generate(body = {}, query: nil)
-        @transport.request("POST", "/video/generate", query: query, body: body)
+      def generate(body = {}, query: nil, **fields)
+        @transport.request("POST", "/video/generate", query: query, body: Transport.body(body, fields))
       end
 
       # POST /video/script (scope: generate:write)
-      def script(body = {}, query: nil)
-        @transport.request("POST", "/video/script", query: query, body: body)
+      def script(body = {}, query: nil, **fields)
+        @transport.request("POST", "/video/script", query: query, body: Transport.body(body, fields))
       end
 
       # GET /video/status/:jobId (scope: media:read)
@@ -583,8 +583,8 @@ module MisarPost
       end
 
       # POST /webhooks/outbound (scope: webhooks:write)
-      def create_outbound(body = {}, query: nil)
-        @transport.request("POST", "/webhooks/outbound", query: query, body: body)
+      def create_outbound(body = {}, query: nil, **fields)
+        @transport.request("POST", "/webhooks/outbound", query: query, body: Transport.body(body, fields))
       end
 
       # DELETE /webhooks/outbound/:id (scope: webhooks:write)
@@ -598,8 +598,8 @@ module MisarPost
       end
 
       # PATCH /webhooks/outbound/:id (scope: webhooks:write)
-      def update_outbound(id, body = {}, query: nil)
-        @transport.request("PATCH", "/webhooks/outbound/#{Transport.enc(id)}", query: query, body: body)
+      def update_outbound(id, body = {}, query: nil, **fields)
+        @transport.request("PATCH", "/webhooks/outbound/#{Transport.enc(id)}", query: query, body: Transport.body(body, fields))
       end
     end
 
@@ -610,13 +610,13 @@ module MisarPost
       end
 
       # POST /workspaces/:id/members (scope: workspaces:write)
-      def add_member(id, body = {}, query: nil)
-        @transport.request("POST", "/workspaces/#{Transport.enc(id)}/members", query: query, body: body)
+      def add_member(id, body = {}, query: nil, **fields)
+        @transport.request("POST", "/workspaces/#{Transport.enc(id)}/members", query: query, body: Transport.body(body, fields))
       end
 
       # POST /workspaces (scope: workspaces:write)
-      def create(body = {}, query: nil)
-        @transport.request("POST", "/workspaces", query: query, body: body)
+      def create(body = {}, query: nil, **fields)
+        @transport.request("POST", "/workspaces", query: query, body: Transport.body(body, fields))
       end
 
       # GET /workspaces (scope: workspaces:read)

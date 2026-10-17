@@ -52,6 +52,20 @@ RSpec.describe MisarPost::Client do
     expect(JSON.parse(call[:body])).to eq("contentText" => "hi")
   end
 
+  # Ruby 3 binds a brace-less trailing hash to keywords rather than to the
+  # positional body. The README's own examples are written brace-less, so all
+  # these spellings must send the same JSON body, with query: still separate.
+  it "sends the same body however the hash is spelled" do
+    post, http = client(Array.new(4) { [200, { "post" => {} }] })
+    post.posts.update("p1", "contentText" => "hi", "status" => "draft")
+    post.posts.update("p1", { "contentText" => "hi", "status" => "draft" })
+    post.posts.update("p1", contentText: "hi", status: "draft")
+    post.posts.update("p1", "contentText" => "hi", "status" => "draft", query: { "dry" => "1" })
+    bodies = http.calls.map { |c| JSON.parse(c[:body]) }
+    expect(bodies.uniq).to eq([{ "contentText" => "hi", "status" => "draft" }])
+    expect(http.calls.last[:uri].query).to eq("dry=1")
+  end
+
   it "passes required query params positionally" do
     post, http = client([[200, { "ok" => true }]])
     post.workspaces.remove_member("ws1", "m1")

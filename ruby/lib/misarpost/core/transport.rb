@@ -52,6 +52,20 @@ module MisarPost
       ERB::Util.url_encode(value.to_s)
     end
 
+    # The JSON body of a call. Ruby 3 binds a brace-less trailing hash
+    # (+update(id, "contentText" => "x")+) to keyword arguments, not to the
+    # positional +body+, so every body method also takes +**fields+ and they
+    # land here. Both spellings, and +update(id, contentText: "x")+, therefore
+    # send the same body.
+    def self.body(body, fields)
+      return body if fields.empty?
+      unless body.nil? || body.is_a?(Hash)
+        raise ArgumentError, "pass the request body as one Hash or as keyword fields, not both"
+      end
+
+      (body || {}).transform_keys(&:to_s).merge(fields.transform_keys(&:to_s))
+    end
+
     def request(method, path, query: nil, body: nil)
       uri = URI("#{@base_url}#{path}#{build_query(query)}")
       headers = {
