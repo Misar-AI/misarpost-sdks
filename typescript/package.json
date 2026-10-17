@@ -1,10 +1,11 @@
 {
-  "name": "@misar/social-sdk",
-  "version": "0.1.0",
-  "description": "TypeScript SDK for the MisarPost API",
+  "name": "@misarpost/sdk",
+  "version": "1.0.0",
+  "description": "MisarPost's social publishing API in TypeScript: schedule and publish posts across every connected channel, generate and repurpose content with AI, research trends, run PersonaForge, read analytics \u2014 typed resources, retries, plan-limit upgrade offers, ESM+CJS.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -12,13 +13,59 @@
       "require": "./dist/index.cjs"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsup",
-    "typecheck": "tsc --noEmit"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "keywords": [
+    "misarpost",
+    "social-media",
+    "social-media-api",
+    "scheduling",
+    "content-calendar",
+    "ai-content",
+    "repurposing",
+    "hashtags",
+    "trends",
+    "linkedin",
+    "twitter",
+    "instagram",
+    "bluesky",
+    "threads",
+    "sdk",
+    "api-client",
+    "typescript",
+    "misar"
+  ],
+  "author": "Misar.AI <hello@misar.io> (https://misar.io)",
+  "license": "MIT",
+  "homepage": "https://www.misarpost.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Misar-AI/misarpost-sdks.git",
+    "directory": "typescript"
+  },
+  "bugs": {
+    "url": "https://github.com/Misar-AI/misarpost-sdks/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
+    "@types/node": "^20.19.43",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "@types/node": "^20.0.0"
+    "vitest": "^3.2.4"
   }
 }

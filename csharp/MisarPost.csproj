@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>MisarPost</RootNamespace>
+    <AssemblyName>MisarPost</AssemblyName>
+
+    <!-- NuGet metadata -->
+    <PackageId>MisarPost</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Misar.AI</Authors>
+    <Company>Misar.AI</Company>
+    <Description>.NET client for MisarPost's social publishing API: schedule and publish posts across every connected channel, generate and repurpose content with AI, research trends, run PersonaForge and read analytics — async/await, retries and typed plan-limit errors with upgrade offers.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Copyright>Copyright (c) 2026 Misar.AI</Copyright>
+    <PackageProjectUrl>https://www.misarpost.com</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Misar-AI/misarpost-sdks</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryBranch>main</RepositoryBranch>
+    <PackageTags>misarpost;social-media;social-media-api;scheduling;content-calendar;ai-content;repurposing;hashtags;trends;linkedin;twitter;instagram;bluesky;api-client;dotnet</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Missing XML doc comments must not fail the build. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <!--
+    Tests/ is its own project (Tests/MisarPostTests.csproj) and references xUnit.
+    Without this exclusion the SDK's default **/*.cs glob pulls the test sources
+    into the library build, which then fails on the missing xUnit reference.
+  -->
+  <ItemGroup>
+    <Compile Remove="Tests/**" />
+    <None Remove="Tests/**" />
+  </ItemGroup>
+
+</Project>

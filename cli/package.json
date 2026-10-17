@@ -1,0 +1,45 @@
+{
+  "name": "@misarpost/cli",
+  "version": "1.0.0",
+  "description": "MisarPost from the terminal: schedule and publish posts, generate and repurpose content with AI, research trends and read analytics — every MisarPost API endpoint as a command, with upgrade cards on plan limits.",
+  "type": "module",
+  "bin": {
+    "misarpost": "bin/misarpost.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.18"
+  },
+  "scripts": {
+    "test": "node --test tests/"
+  },
+  "keywords": [
+    "misarpost",
+    "cli",
+    "social-media",
+    "scheduling",
+    "content",
+    "ai",
+    "misar"
+  ],
+  "author": "Misar.AI <hello@misar.io> (https://misar.io)",
+  "license": "MIT",
+  "homepage": "https://www.misarpost.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Misar-AI/misarpost-sdks.git",
+    "directory": "cli"
+  },
+  "bugs": {
+    "url": "https://github.com/Misar-AI/misarpost-sdks/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
+}

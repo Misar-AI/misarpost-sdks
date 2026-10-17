@@ -1,0 +1,29 @@
+[package]
+name = "misarpost"
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Async Rust client for MisarPost's social publishing API: schedule and publish posts across every connected channel, generate and repurpose content with AI, research trends, run PersonaForge and read analytics. Retries, typed plan-limit errors with upgrade offers."
+license = "MIT"
+authors = ["Misar.AI <hello@misar.io>"]
+homepage = "https://www.misarpost.com"
+repository = "https://github.com/Misar-AI/misarpost-sdks"
+documentation = "https://docs.misar.io/post"
+# crates.io allows at most five keywords, each <= 20 chars.
+keywords = ["social-media", "scheduling", "content", "misarpost", "api-client"]
+categories = ["api-bindings", "web-programming::http-client", "asynchronous"]
+readme = "README.md"
+
+[dependencies]
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+tokio = { version = "1", features = ["time"] }
+serde_json = "1"
+thiserror = "1"
+urlencoding = "2"
+hmac = "0.12"
+sha2 = "0.10"
+hex = "0.4"
+
+[dev-dependencies]
+wiremock = "0.6"
+tokio = { version = "1", features = ["full"] }

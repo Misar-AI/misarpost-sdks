@@ -1,0 +1,58 @@
+{
+    "name": "misarai/misarpost-php",
+    "description": "PHP client for MisarPost's social publishing API: schedule and publish posts across every connected channel, generate and repurpose content with AI, research trends, run PersonaForge and read analytics — retries and typed plan-limit errors with upgrade offers.",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://www.misarpost.com",
+    "keywords": [
+        "misarpost",
+        "social-media",
+        "social-media-api",
+        "scheduling",
+        "content-calendar",
+        "ai-content",
+        "repurposing",
+        "hashtags",
+        "trends",
+        "linkedin",
+        "twitter",
+        "instagram",
+        "bluesky",
+        "api-client",
+        "misar"
+    ],
+    "authors": [
+        {
+            "name": "Misar.AI",
+            "email": "hello@misar.io",
+            "homepage": "https://misar.io",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/Misar-AI/misarpost-sdks/issues",
+        "source": "https://github.com/Misar-AI/misarpost-sdks/tree/main/php",
+        "docs": "https://docs.misar.io/post"
+    },
+    "require": {
+        "php": ">=8.1",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MisarAI\\MisarPost\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MisarAI\\MisarPost\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    }
+}

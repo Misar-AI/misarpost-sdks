@@ -1,0 +1,1435 @@
+[
+  {
+    "resource": "analytics",
+    "resourceKebab": "analytics",
+    "method": "stats",
+    "command": "stats",
+    "verb": "GET",
+    "path": "/stats",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "analytics:read"
+  },
+  {
+    "resource": "analytics",
+    "resourceKebab": "analytics",
+    "method": "trends",
+    "command": "trends",
+    "verb": "GET",
+    "path": "/analytics/trends",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "days"
+    ],
+    "hasBody": false,
+    "scope": "analytics:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "discordChannels",
+    "command": "discord-channels",
+    "verb": "GET",
+    "path": "/composer/discord/channels",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "hashnodePublications",
+    "command": "hashnode-publications",
+    "verb": "GET",
+    "path": "/composer/hashnode/publications",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "hashnodeTags",
+    "command": "hashnode-tags",
+    "verb": "GET",
+    "path": "/composer/hashnode/tags",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "lemmyCommunities",
+    "command": "lemmy-communities",
+    "verb": "GET",
+    "path": "/composer/lemmy/communities",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "listmonkLists",
+    "command": "listmonk-lists",
+    "verb": "GET",
+    "path": "/composer/listmonk/lists",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "listmonkTemplates",
+    "command": "listmonk-templates",
+    "verb": "GET",
+    "path": "/composer/listmonk/templates",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "mediumPublications",
+    "command": "medium-publications",
+    "verb": "GET",
+    "path": "/composer/medium/publications",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "pinterestBoards",
+    "command": "pinterest-boards",
+    "verb": "GET",
+    "path": "/composer/pinterest/boards",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "redditFlairs",
+    "command": "reddit-flairs",
+    "verb": "GET",
+    "path": "/composer/reddit/flairs",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId",
+      "subreddit"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "skoolGroups",
+    "command": "skool-groups",
+    "verb": "GET",
+    "path": "/composer/skool/groups",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "slackChannels",
+    "command": "slack-channels",
+    "verb": "GET",
+    "path": "/composer/slack/channels",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "composer",
+    "resourceKebab": "composer",
+    "method": "whopForums",
+    "command": "whop-forums",
+    "verb": "GET",
+    "path": "/composer/whop/forums",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "accountId"
+    ],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "connections",
+    "resourceKebab": "connections",
+    "method": "list",
+    "command": "list",
+    "verb": "GET",
+    "path": "/connections",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "connections",
+    "resourceKebab": "connections",
+    "method": "plugs",
+    "command": "plugs",
+    "verb": "GET",
+    "path": "/connections/:accountId/plugs",
+    "pathParams": [
+      "accountId"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "connections",
+    "resourceKebab": "connections",
+    "method": "updatePlugs",
+    "command": "update-plugs",
+    "verb": "PATCH",
+    "path": "/connections/:accountId/plugs",
+    "pathParams": [
+      "accountId"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "connections:write"
+  },
+  {
+    "resource": "connections",
+    "resourceKebab": "connections",
+    "method": "wordpressTaxonomies",
+    "command": "wordpress-taxonomies",
+    "verb": "GET",
+    "path": "/connections/:accountId/wordpress-taxonomies",
+    "pathParams": [
+      "accountId"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "connections:read"
+  },
+  {
+    "resource": "contentripple",
+    "resourceKebab": "contentripple",
+    "method": "deleteHistory",
+    "command": "delete-history",
+    "verb": "DELETE",
+    "path": "/contentripple/history",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "contentripple",
+    "resourceKebab": "contentripple",
+    "method": "feed",
+    "command": "feed",
+    "verb": "POST",
+    "path": "/contentripple/feed",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "contentripple",
+    "resourceKebab": "contentripple",
+    "method": "history",
+    "command": "history",
+    "verb": "GET",
+    "path": "/contentripple/history",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "limit"
+    ],
+    "hasBody": false,
+    "scope": "posts:read"
+  },
+  {
+    "resource": "contentripple",
+    "resourceKebab": "contentripple",
+    "method": "parse",
+    "command": "parse",
+    "verb": "POST",
+    "path": "/contentripple/parse",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "contentripple",
+    "resourceKebab": "contentripple",
+    "method": "repurpose",
+    "command": "repurpose",
+    "verb": "POST",
+    "path": "/contentripple",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "contentripple",
+    "resourceKebab": "contentripple",
+    "method": "schedule",
+    "command": "schedule",
+    "verb": "POST",
+    "path": "/contentripple/schedule",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "schedule:write"
+  },
+  {
+    "resource": "contentripple",
+    "resourceKebab": "contentripple",
+    "method": "updateVariants",
+    "command": "update-variants",
+    "verb": "PATCH",
+    "path": "/contentripple/variants",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "contentripple",
+    "resourceKebab": "contentripple",
+    "method": "usage",
+    "command": "usage",
+    "verb": "GET",
+    "path": "/contentripple",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:read"
+  },
+  {
+    "resource": "drafts",
+    "resourceKebab": "drafts",
+    "method": "create",
+    "command": "create",
+    "verb": "POST",
+    "path": "/drafts",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "drafts",
+    "resourceKebab": "drafts",
+    "method": "list",
+    "command": "list",
+    "verb": "GET",
+    "path": "/drafts",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:read"
+  },
+  {
+    "resource": "generate",
+    "resourceKebab": "generate",
+    "method": "create",
+    "command": "create",
+    "verb": "POST",
+    "path": "/generate",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "generate",
+    "resourceKebab": "generate",
+    "method": "enhance",
+    "command": "enhance",
+    "verb": "POST",
+    "path": "/generate/enhance",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "generate",
+    "resourceKebab": "generate",
+    "method": "hashtags",
+    "command": "hashtags",
+    "verb": "POST",
+    "path": "/generate/hashtags",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "generate",
+    "resourceKebab": "generate",
+    "method": "image",
+    "command": "image",
+    "verb": "POST",
+    "path": "/generate/image",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "generate",
+    "resourceKebab": "generate",
+    "method": "optimize",
+    "command": "optimize",
+    "verb": "GET",
+    "path": "/generate/optimize",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "platform"
+    ],
+    "hasBody": false,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "generate",
+    "resourceKebab": "generate",
+    "method": "plan",
+    "command": "plan",
+    "verb": "POST",
+    "path": "/generate/plan",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "growth",
+    "resourceKebab": "growth",
+    "method": "nextOpportunity",
+    "command": "next-opportunity",
+    "verb": "GET",
+    "path": "/growth/next-opportunity",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "analytics:read"
+  },
+  {
+    "resource": "growth",
+    "resourceKebab": "growth",
+    "method": "opportunities",
+    "command": "opportunities",
+    "verb": "GET",
+    "path": "/growth/opportunities",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "analytics:read"
+  },
+  {
+    "resource": "growth",
+    "resourceKebab": "growth",
+    "method": "overview",
+    "command": "overview",
+    "verb": "GET",
+    "path": "/growth/overview",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "days"
+    ],
+    "hasBody": false,
+    "scope": "analytics:read"
+  },
+  {
+    "resource": "growth",
+    "resourceKebab": "growth",
+    "method": "playbooks",
+    "command": "playbooks",
+    "verb": "GET",
+    "path": "/growth/playbooks",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "analytics:read"
+  },
+  {
+    "resource": "media",
+    "resourceKebab": "media",
+    "method": "delete",
+    "command": "delete",
+    "verb": "DELETE",
+    "path": "/media/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "media:write"
+  },
+  {
+    "resource": "media",
+    "resourceKebab": "media",
+    "method": "list",
+    "command": "list",
+    "verb": "GET",
+    "path": "/media",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "page"
+    ],
+    "hasBody": false,
+    "scope": "media:read"
+  },
+  {
+    "resource": "notifications",
+    "resourceKebab": "notifications",
+    "method": "list",
+    "command": "list",
+    "verb": "GET",
+    "path": "/notifications",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "notifications:read"
+  },
+  {
+    "resource": "notifications",
+    "resourceKebab": "notifications",
+    "method": "readAll",
+    "command": "read-all",
+    "verb": "POST",
+    "path": "/notifications/read-all",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "notifications:write"
+  },
+  {
+    "resource": "notifications",
+    "resourceKebab": "notifications",
+    "method": "update",
+    "command": "update",
+    "verb": "PATCH",
+    "path": "/notifications/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "notifications:write"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "approveReplies",
+    "command": "approve-replies",
+    "verb": "POST",
+    "path": "/personaforge/replies/approve",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "personas:write"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "bio",
+    "command": "bio",
+    "verb": "POST",
+    "path": "/personaforge/bio",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "createCompetitors",
+    "command": "create-competitors",
+    "verb": "POST",
+    "path": "/personaforge/competitors",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "personas:write"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "createPersona",
+    "command": "create-persona",
+    "verb": "POST",
+    "path": "/personaforge/personas",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "personas:write"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "createReplies",
+    "command": "create-replies",
+    "verb": "POST",
+    "path": "/personaforge/replies",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "personas:write"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "createVoice",
+    "command": "create-voice",
+    "verb": "POST",
+    "path": "/personaforge/voice",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "personas:write"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "deletePersona",
+    "command": "delete-persona",
+    "verb": "DELETE",
+    "path": "/personaforge/personas/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "personas:write"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "generate",
+    "command": "generate",
+    "verb": "POST",
+    "path": "/personaforge/generate",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "getPersona",
+    "command": "get-persona",
+    "verb": "GET",
+    "path": "/personaforge/personas/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "personas:read"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "getVoice",
+    "command": "get-voice",
+    "verb": "GET",
+    "path": "/personaforge/voice",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "personas:read"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "listCompetitors",
+    "command": "list-competitors",
+    "verb": "GET",
+    "path": "/personaforge/competitors",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "personas:read"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "listPersonas",
+    "command": "list-personas",
+    "verb": "GET",
+    "path": "/personaforge/personas",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "personas:read"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "listReplies",
+    "command": "list-replies",
+    "verb": "GET",
+    "path": "/personaforge/replies",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "status"
+    ],
+    "hasBody": false,
+    "scope": "personas:read"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "personaStatus",
+    "command": "persona-status",
+    "verb": "GET",
+    "path": "/personaforge/personas/status/:jobId",
+    "pathParams": [
+      "jobId"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "personas:read"
+  },
+  {
+    "resource": "personaforge",
+    "resourceKebab": "personaforge",
+    "method": "updatePersona",
+    "command": "update-persona",
+    "verb": "PATCH",
+    "path": "/personaforge/personas/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "personas:write"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "calendar",
+    "command": "calendar",
+    "verb": "GET",
+    "path": "/calendar",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "from",
+      "tagId",
+      "to"
+    ],
+    "hasBody": false,
+    "scope": "posts:read"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "cancel",
+    "command": "cancel",
+    "verb": "DELETE",
+    "path": "/posts",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "delete",
+    "command": "delete",
+    "verb": "DELETE",
+    "path": "/posts/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "list",
+    "command": "list",
+    "verb": "GET",
+    "path": "/posts",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "page",
+      "status",
+      "tagId"
+    ],
+    "hasBody": false,
+    "scope": "posts:read"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "reply",
+    "command": "reply",
+    "verb": "POST",
+    "path": "/posts/:id/reply",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "revert",
+    "command": "revert",
+    "verb": "POST",
+    "path": "/posts/:id/revert",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "revertBatch",
+    "command": "revert-batch",
+    "verb": "POST",
+    "path": "/posts/revert-batch",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "schedule",
+    "command": "schedule",
+    "verb": "POST",
+    "path": "/schedule",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "schedule:write"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "share",
+    "command": "share",
+    "verb": "POST",
+    "path": "/posts/:id/share",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "unshare",
+    "command": "unshare",
+    "verb": "DELETE",
+    "path": "/posts/:id/share",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "posts",
+    "resourceKebab": "posts",
+    "method": "update",
+    "command": "update",
+    "verb": "PATCH",
+    "path": "/posts/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "postTags",
+    "resourceKebab": "post-tags",
+    "method": "create",
+    "command": "create",
+    "verb": "POST",
+    "path": "/post-tags",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "postTags",
+    "resourceKebab": "post-tags",
+    "method": "delete",
+    "command": "delete",
+    "verb": "DELETE",
+    "path": "/post-tags/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "postTags",
+    "resourceKebab": "post-tags",
+    "method": "list",
+    "command": "list",
+    "verb": "GET",
+    "path": "/post-tags",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:read"
+  },
+  {
+    "resource": "postTags",
+    "resourceKebab": "post-tags",
+    "method": "update",
+    "command": "update",
+    "verb": "PATCH",
+    "path": "/post-tags/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "postTemplates",
+    "resourceKebab": "post-templates",
+    "method": "create",
+    "command": "create",
+    "verb": "POST",
+    "path": "/post-templates",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "postTemplates",
+    "resourceKebab": "post-templates",
+    "method": "delete",
+    "command": "delete",
+    "verb": "DELETE",
+    "path": "/post-templates/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "postTemplates",
+    "resourceKebab": "post-templates",
+    "method": "get",
+    "command": "get",
+    "verb": "GET",
+    "path": "/post-templates/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:read"
+  },
+  {
+    "resource": "postTemplates",
+    "resourceKebab": "post-templates",
+    "method": "list",
+    "command": "list",
+    "verb": "GET",
+    "path": "/post-templates",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "posts:read"
+  },
+  {
+    "resource": "postTemplates",
+    "resourceKebab": "post-templates",
+    "method": "update",
+    "command": "update",
+    "verb": "PATCH",
+    "path": "/post-templates/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "posts:write"
+  },
+  {
+    "resource": "trendpulse",
+    "resourceKebab": "trendpulse",
+    "method": "createPlatformContent",
+    "command": "create-platform-content",
+    "verb": "POST",
+    "path": "/trendpulse/platform-content",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "trends:write"
+  },
+  {
+    "resource": "trendpulse",
+    "resourceKebab": "trendpulse",
+    "method": "digest",
+    "command": "digest",
+    "verb": "POST",
+    "path": "/trendpulse/digest",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "trends:write"
+  },
+  {
+    "resource": "trendpulse",
+    "resourceKebab": "trendpulse",
+    "method": "fetch",
+    "command": "fetch",
+    "verb": "POST",
+    "path": "/trendpulse/fetch",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "trends:write"
+  },
+  {
+    "resource": "trendpulse",
+    "resourceKebab": "trendpulse",
+    "method": "hooks",
+    "command": "hooks",
+    "verb": "GET",
+    "path": "/trendpulse/hooks",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "snapshotId"
+    ],
+    "hasBody": false,
+    "scope": "trends:read"
+  },
+  {
+    "resource": "trendpulse",
+    "resourceKebab": "trendpulse",
+    "method": "list",
+    "command": "list",
+    "verb": "GET",
+    "path": "/trendpulse",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "trends:read"
+  },
+  {
+    "resource": "trendpulse",
+    "resourceKebab": "trendpulse",
+    "method": "listPlatformContent",
+    "command": "list-platform-content",
+    "verb": "GET",
+    "path": "/trendpulse/platform-content",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "snapshotId"
+    ],
+    "hasBody": false,
+    "scope": "trends:read"
+  },
+  {
+    "resource": "trendpulse",
+    "resourceKebab": "trendpulse",
+    "method": "performance",
+    "command": "performance",
+    "verb": "GET",
+    "path": "/trendpulse/performance",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "analytics:read"
+  },
+  {
+    "resource": "trendpulse",
+    "resourceKebab": "trendpulse",
+    "method": "pipeline",
+    "command": "pipeline",
+    "verb": "POST",
+    "path": "/trendpulse/pipeline",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "schedule:write"
+  },
+  {
+    "resource": "trendpulse",
+    "resourceKebab": "trendpulse",
+    "method": "refresh",
+    "command": "refresh",
+    "verb": "POST",
+    "path": "/trendpulse",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "trends:write"
+  },
+  {
+    "resource": "trendpulse",
+    "resourceKebab": "trendpulse",
+    "method": "usePlatformContent",
+    "command": "use-platform-content",
+    "verb": "POST",
+    "path": "/trendpulse/platform-content/use",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "trends:write"
+  },
+  {
+    "resource": "video",
+    "resourceKebab": "video",
+    "method": "avatars",
+    "command": "avatars",
+    "verb": "GET",
+    "path": "/video/avatars",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "provider"
+    ],
+    "hasBody": false,
+    "scope": "media:read"
+  },
+  {
+    "resource": "video",
+    "resourceKebab": "video",
+    "method": "generate",
+    "command": "generate",
+    "verb": "POST",
+    "path": "/video/generate",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "video",
+    "resourceKebab": "video",
+    "method": "script",
+    "command": "script",
+    "verb": "POST",
+    "path": "/video/script",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "generate:write"
+  },
+  {
+    "resource": "video",
+    "resourceKebab": "video",
+    "method": "status",
+    "command": "status",
+    "verb": "GET",
+    "path": "/video/status/:jobId",
+    "pathParams": [
+      "jobId"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "media:read"
+  },
+  {
+    "resource": "video",
+    "resourceKebab": "video",
+    "method": "voices",
+    "command": "voices",
+    "verb": "GET",
+    "path": "/video/voices",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [
+      "provider"
+    ],
+    "hasBody": false,
+    "scope": "media:read"
+  },
+  {
+    "resource": "webhooks",
+    "resourceKebab": "webhooks",
+    "method": "createOutbound",
+    "command": "create-outbound",
+    "verb": "POST",
+    "path": "/webhooks/outbound",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "webhooks:write"
+  },
+  {
+    "resource": "webhooks",
+    "resourceKebab": "webhooks",
+    "method": "deleteOutbound",
+    "command": "delete-outbound",
+    "verb": "DELETE",
+    "path": "/webhooks/outbound/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "webhooks:write"
+  },
+  {
+    "resource": "webhooks",
+    "resourceKebab": "webhooks",
+    "method": "listOutbound",
+    "command": "list-outbound",
+    "verb": "GET",
+    "path": "/webhooks/outbound",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "webhooks:read"
+  },
+  {
+    "resource": "webhooks",
+    "resourceKebab": "webhooks",
+    "method": "updateOutbound",
+    "command": "update-outbound",
+    "verb": "PATCH",
+    "path": "/webhooks/outbound/:id",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "webhooks:write"
+  },
+  {
+    "resource": "workspaces",
+    "resourceKebab": "workspaces",
+    "method": "addMember",
+    "command": "add-member",
+    "verb": "POST",
+    "path": "/workspaces/:id/members",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "workspaces:write"
+  },
+  {
+    "resource": "workspaces",
+    "resourceKebab": "workspaces",
+    "method": "create",
+    "command": "create",
+    "verb": "POST",
+    "path": "/workspaces",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": true,
+    "scope": "workspaces:write"
+  },
+  {
+    "resource": "workspaces",
+    "resourceKebab": "workspaces",
+    "method": "list",
+    "command": "list",
+    "verb": "GET",
+    "path": "/workspaces",
+    "pathParams": [],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "workspaces:read"
+  },
+  {
+    "resource": "workspaces",
+    "resourceKebab": "workspaces",
+    "method": "members",
+    "command": "members",
+    "verb": "GET",
+    "path": "/workspaces/:id/members",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [],
+    "queryParams": [],
+    "hasBody": false,
+    "scope": "workspaces:read"
+  },
+  {
+    "resource": "workspaces",
+    "resourceKebab": "workspaces",
+    "method": "removeMember",
+    "command": "remove-member",
+    "verb": "DELETE",
+    "path": "/workspaces/:id/members",
+    "pathParams": [
+      "id"
+    ],
+    "requiredQuery": [
+      "memberId"
+    ],
+    "queryParams": [
+      "memberId"
+    ],
+    "hasBody": false,
+    "scope": "workspaces:write"
+  }
+]
