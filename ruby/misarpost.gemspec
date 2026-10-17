@@ -17,8 +17,7 @@ Gem::Specification.new do |spec|
     "documentation_uri" => "https://docs.misar.io/post",
     "source_code_uri" => "https://github.com/Misar-AI/misarpost-sdks/tree/main/ruby",
     "changelog_uri" => "https://github.com/Misar-AI/misarpost-sdks/blob/main/ruby/CHANGELOG.md",
-    "bug_tracker_uri" => "https://github.com/Misar-AI/misarpost-sdks/issues",
-    "rubygems_mfa_required" => "true"
+    "bug_tracker_uri" => "https://github.com/Misar-AI/misarpost-sdks/issues"
   }
   spec.files = Dir["lib/**/*.rb"] + %w[README.md LICENSE CHANGELOG.md]
   spec.require_paths = ["lib"]
