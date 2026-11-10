@@ -69,7 +69,6 @@ jobs:
             case "$lang" in
               typescript) file="typescript/package.json" ;;
               cli)        file="cli/package.json" ;;
-              python)     file="python/pyproject.toml" ;;
               rust)       file="rust/Cargo.toml" ;;
               ruby)       file="ruby/misarpost.gemspec" ;;
               dart)       file="dart/pubspec.yaml" ;;
@@ -85,7 +84,7 @@ jobs:
 
             case "$lang" in
               typescript|cli) printf '%s' "$content" | jq -r '.version // empty' ;;
-              python|rust) printf '%s' "$content" | grep -m1 -E '^version[[:space:]]*=' | grep -oE '"[^"]+"' | tr -d '"' ;;
+              rust) printf '%s' "$content" | grep -m1 -E '^version[[:space:]]*=' | grep -oE '"[^"]+"' | tr -d '"' ;;
               ruby|kotlin) printf '%s' "$content" | grep -m1 -E 'version[[:space:]]*=' | grep -oE '"[^"]+"' | tr -d '"' ;;
               dart|flutter) printf '%s' "$content" | grep -m1 -E '^version:' | awk '{print $2}' ;;
               java) printf '%s' "$content" | grep -m1 -oE '<version>[^<]+</version>' | sed 's/<[^>]*>//g' ;;
@@ -106,7 +105,7 @@ jobs:
           git config user.email "noreply@misar.io"
 
           TAGGED=0
-          for LANG in typescript cli python rust ruby dart flutter java kotlin csharp; do
+          for LANG in typescript cli rust ruby dart flutter java kotlin csharp; do
             NOW="$(version_at HEAD "$LANG" || true)"
             [ -n "$NOW" ] || continue
 

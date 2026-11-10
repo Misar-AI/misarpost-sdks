@@ -12,11 +12,6 @@ build/
 .build/
 *.xcodeproj
 
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-.pytest_cache/
 dist/
 
 # Rust

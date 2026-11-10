@@ -11,7 +11,7 @@ Nothing is published to any registry from this repository or from Forgejo CI.
 
 ## How a release happens
 
-1. Bump the version in the SDK's own manifest (`package.json`, `pyproject.toml`,
+1. Bump the version in the SDK's own manifest (`package.json`,
    `Cargo.toml`, `misarpost.gemspec`, `MisarPost.csproj`, `pom.xml`,
    `build.gradle.kts`, `pubspec.yaml`) — or `sdks/VERSION` for Go, Swift and PHP,
    which have no manifest version — and add a CHANGELOG entry.
@@ -35,7 +35,6 @@ re-tag.
 |-----|-----|----------|------------|
 | TypeScript | `typescript/v1.0.0` | npm | `@misarpost/sdk` |
 | CLI | `cli/v1.0.0` | npm | `@misarpost/cli` |
-| Python | `python/v1.0.0` | PyPI (Trusted Publishing) | `misarpost` |
 | Rust | `rust/v1.0.0` | crates.io | `misarpost` |
 | Ruby | `ruby/v1.0.0` | RubyGems | `misarpost` |
 | C# | `csharp/v1.0.0` | NuGet | `MisarPost` |
@@ -77,7 +76,7 @@ Set on `Misar-AI/misarpost-sdks` → Settings → Secrets → Actions:
 | `GPG_PRIVATE_KEY`, `GPG_PASSPHRASE` | Maven Central signing |
 | `PACKAGIST_USERNAME`, `PACKAGIST_API_TOKEN` | Packagist re-crawl |
 
-PyPI and pub.dev use OIDC (Trusted Publishing / automated publishing) and need no
+pub.dev uses OIDC (automated publishing) and needs no
 stored secret — configure the `release` environment on the mirror instead.
 
 On Forgejo, `sync-sdks-to-github.yml` needs `GH_SYNC_TOKEN` (push access to the
@@ -86,7 +85,6 @@ mirror).
 ## One-time registry setup
 
 - **npm** — org `misarpost`; token with publish access.
-- **PyPI** — add the mirror's `publish.yml` as a Trusted Publisher for `misarpost`.
 - **crates.io** — sign in with GitHub, generate a token.
 - **RubyGems** — the first `gem push` needs email confirmation; MFA is required.
 - **pub.dev** — publish `misarpost` before `misarpost_flutter`; enable automated

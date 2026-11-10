@@ -16,7 +16,7 @@
  *
  * The tag is the authority on version. A tag that disagrees with the manifest
  * is always an error rather than something to reconcile — silently trusting
- * either one is how `sdk-python-v1.0.2` ends up publishing 1.0.1 forever.
+ * either one is how `sdk-rust-v1.0.2` ends up publishing 1.0.1 forever.
  */
 
 import { readFileSync, existsSync } from "node:fs";
@@ -26,7 +26,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 // Two layouts, one script. In this monorepo the SDKs live under sdks/; in the
-// public mirror they ARE the repository root (typescript/, python/, …). The
+// public mirror they ARE the repository root (typescript/, rust/, …). The
 // mirror runs this same file, so it must work in both rather than growing a
 // second copy that drifts.
 const SDKS = existsSync(join(ROOT, "sdks", "typescript")) ? join(ROOT, "sdks") : ROOT;
@@ -40,7 +40,6 @@ const SDKS = existsSync(join(ROOT, "sdks", "typescript")) ? join(ROOT, "sdks") :
  */
 const MANIFESTS = {
   typescript: { file: "typescript/package.json", read: (s) => JSON.parse(s).version, registry: "npm" },
-  python:     { file: "python/pyproject.toml", read: (s) => match(s, /^version\s*=\s*"([^"]+)"/m), registry: "PyPI" },
   rust:       { file: "rust/Cargo.toml", read: (s) => match(s, /^version\s*=\s*"([^"]+)"/m), registry: "crates.io" },
   ruby:       { file: "ruby/misarpost.gemspec", read: (s) => match(s, /version\s*=\s*"([^"]+)"/), registry: "RubyGems" },
   dart:       { file: "dart/pubspec.yaml", read: (s) => match(s, /^version:\s*(\S+)/m), registry: "pub.dev" },
