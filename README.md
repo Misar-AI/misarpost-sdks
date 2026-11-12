@@ -19,6 +19,7 @@ Base URL: `https://api.misar.io/post` (dual-served at `https://post.misar.io/api
 |---|---|---|
 | TypeScript / JavaScript | npm | `@misarpost/sdk` |
 | CLI | npm | `@misarpost/cli` (bin `misarpost`) |
+| Python | PyPI | `misarpost` |
 | Go | module proxy | `github.com/Misar-AI/misarpost-sdks/go` |
 | Rust | crates.io | `misarpost` |
 | Java | Maven Central | `io.misar:misarpost` |
